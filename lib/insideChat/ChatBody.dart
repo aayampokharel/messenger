@@ -37,7 +37,7 @@ class _ChatBodyState extends State<ChatBody> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _streamController = widget.chatStream.asBroadcastStream();
+    //   _streamController = widget.chatStream.asBroadcastStream();
     getChatHistoryList().then((value) => print(value));
   }
 
