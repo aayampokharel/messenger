@@ -37,6 +37,7 @@ class _ChatBodyState extends State<ChatBody> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _streamController = widget.chatStream.asBroadcastStream();
     getChatHistoryList().then((value) => print(value));
   }
 
@@ -101,9 +102,8 @@ class _ChatBodyState extends State<ChatBody> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      widget.chatStream.add();
-                    }, //! ESKO KAAM BHANEKO SIMPLY SEND MATRA GARNE HO .NOTHING ELSE.
+                    onPressed:
+                        () {}, //! ESKO KAAM BHANEKO SIMPLY SEND MATRA GARNE HO .NOTHING ELSE.
                     icon: const Icon(Icons.send),
                   ),
                 ],
