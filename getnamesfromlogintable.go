@@ -9,7 +9,7 @@ import (
 
 
 func getNamesFromLoginTable(db *sql.DB,w http.ResponseWriter,_ *http.Request) {
-	//@ gets names deom logincredential_table should be used when flag=NO.
+	//@ gets names fromlogincredential_table should be used when flag=NO.
 	var displayName string;
 	var historyOfNames []string;
 
