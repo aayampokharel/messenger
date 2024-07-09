@@ -19,7 +19,8 @@ func getNamesFromUserSearchHistoryTable(db *sql.DB, w http.ResponseWriter, r *ht
 
 	query:=`select l1.display_name from user_search_history s1
 inner join loginCredential_table l1 on s1.other_user_id=l1.registration_id where s1.current_user_id=? `;//@select names after joining the logincredential table .  
-rows,er:=db.Query(query,currentUserId.UserId);
+rows,er:=db.Query(query,currentUserId);//returning strung //@ returning string and receiving through nt ? 
+
 if er!=nil{
 	fmt.Print("cant select a problem in db has arrived ");
 return; 

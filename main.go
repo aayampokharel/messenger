@@ -53,7 +53,7 @@ USERNAME, DBPASSWORD, DBHOST, DBPORT, DBNAME:=initializeSQL();
         CORSfix(w);
         getNamesFromUserSearchHistoryTable(db,w,r);
       })
-        chiRouter.Post("/getnames",func(w http.ResponseWriter, r *http.Request) {
+        chiRouter.Post("/getnamesfromlogintable",func(w http.ResponseWriter, r *http.Request) {
         CORSfix(w);
         getNamesFromLoginTable(db,w,r);
       })

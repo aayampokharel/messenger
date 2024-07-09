@@ -10,6 +10,7 @@ import (
 
 func getNamesFromLoginTable(db *sql.DB,w http.ResponseWriter,r *http.Request) {
 	//@ gets names from logincredential_table should be used when flag=NO.
+	//# requires registration id . 
 	var displayName string;
 	var currentUserId UserId;
 	var historyOfNames []string;

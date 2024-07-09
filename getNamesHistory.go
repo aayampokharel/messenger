@@ -11,7 +11,7 @@ type UserId struct{
 }
 
 type SearchHistory struct{
-	currentUserId int `json:"currentUserId"`;
+	CurrentUserId int `json:"CurrentUserId"`;
 	OtherUserId int `json:"OtherUserId"`;
 
 }
@@ -34,7 +34,7 @@ if er!=nil{
         return
     }
 	for rows.Next() {
-	rows.Scan(&searchHistory.currentUserId,&searchHistory.OtherUserId);
+	rows.Scan(&searchHistory.CurrentUserId,&searchHistory.OtherUserId);
 listOfNamesHistory = append(listOfNamesHistory, searchHistory);
 	}
 	errors:=json.NewEncoder(w).Encode(&listOfNamesHistory);
