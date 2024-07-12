@@ -81,6 +81,7 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 		}
 	} else {
+		//@ yo chai from search bata aauda ho where we wont fetch roomid .so roomid=null yo send garda chai . so tesbela i have to check row empty huna ni sakcha cause there might not be connection established . as eeuta completely new manche bhayo bhane there wont be any friend request exchanged.
 		var roomId int
 		forEmptyRoomQuery := `select room_id,sender_id,receiver_id,latest_time from chat_connections where room_id=?`
 		db.QueryRow(forEmptyRoomQuery, chatConnection.RoomId).Scan(&roomId, &forTime.SenderId, &forTime.ReceiverId, &forTime.LatestTime)
