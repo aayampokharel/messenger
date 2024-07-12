@@ -39,9 +39,7 @@ func signIn(db *sql.DB,_ http.ResponseWriter, r *http.Request) {
 
 	query:="INSERT INTO loginCredential_table(email,display_name,passwords) VALUES (?,?,?)";
 	_,er:=db.Exec(query,signInInfo.Email,signInInfo.Name,signInInfo.Key);
-	if er!=nil{//email VARCHAR(100) primary key,
-		//...//display_name VARCHAR(50) NOT NULL,
-		//passwords varchar(40) not null
+	if er!=nil{
         fmt.Print("Error while insertion from signIn() function.");
 		return;
     }

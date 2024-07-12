@@ -32,6 +32,8 @@ USERNAME, DBPASSWORD, DBHOST, DBPORT, DBNAME:=initializeSQL();
      chiRouter.Post("/signin",func(w http.ResponseWriter, r *http.Request) {
      CORSfix(w);
       signIn(db,w,r);
+    
+	//query:="INSERT INTO loginCredential_table(email,display_name,passwords) VALUES (?,?,?)";
       });
       chiRouter.Post("/sendrequest",func(w http.ResponseWriter, r *http.Request) {
         CORSfix(w);
@@ -69,10 +71,9 @@ USERNAME, DBPASSWORD, DBHOST, DBPORT, DBNAME:=initializeSQL();
       
       log.Fatal(http.ListenAndServe(":8080",chiRouter));
       //// ALWAYS CLOSE THE BODY AND OTHER THINGS FROM table or other stuffs.
-   }
-   
-   
-   
+}
+  
+  
 
 
 
