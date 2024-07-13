@@ -8,9 +8,14 @@ import (
 )
 
 type ChatConnection struct {
-	RoomId     int `json:"RoomId"`
-	SenderId   int `json:"SenderId"`
-	ReceiverId int `json:"ReceiverId"`
+	RoomId     sql.NullInt64 `json:"RoomId"`
+	SenderId   int           `json:"SenderId"`
+	ReceiverId int           `json:"ReceiverId"`
+}
+type ChatConnectionPointerInt struct {
+	RoomId     *int64 `json:"RoomId"`
+	SenderId   int    `json:"SenderId"`
+	ReceiverId int    `json:"ReceiverId"`
 }
 type LoadChat struct {
 	ReceiverId int    `json:"ReceiverId"`
@@ -39,26 +44,51 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	//}
 
 	var chatConnection ChatConnection
+	var chatConnectionPointer ChatConnectionPointerInt
 
-	err := json.NewDecoder(r.Body).Decode(&chatConnection)
+	err := json.NewDecoder(r.Body).Decode(&chatConnectionPointer)
+	//
 	if err != nil {
 		fmt.Print("error while decoding in loadchathistory.go")
 		return
 	}
+	//
+	chatConnection.ReceiverId = chatConnectionPointer.ReceiverId
+	chatConnection.SenderId = chatConnectionPointer.SenderId
+	//
+	if chatConnectionPointer.RoomId != nil {
+		chatConnection.RoomId = sql.NullInt64{Int64: *chatConnectionPointer.RoomId, Valid: true}
 
-	var mapJSON map[string]interface{} /// { PrivateChats, }
+	} else {
+		chatConnection.RoomId = sql.NullInt64{
+			Int64: 0, //ignored by db but still written for clarity.
+			Valid: false}
+
+	}
+	fmt.Print(chatConnection, " \n\n\n\n\n\n\n\n")
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	mapJSON := make(map[string]interface{}) /// { PrivateChats, }
 	var listOfLocalPrivateChat []LoadChat
 	var localPrivateChat LoadChat
-	if chatConnection.RoomId.Valid { //@ to determine whether the roomId is null or not . null when request sent from search ,
+	//
+	//
+	//@ to determine whether the roomId is null or not . null when request sent from search ,
+	if chatConnection.RoomId.Valid {
 		var forTime ForTime
 		//? checkTimeQuery is here because  i want to know the time,also senderand receiver  id is extracted for displaying who sent request to whom at first.
+		//
+		//
 		checkTimeQuery := `select sender_id,receiver_id,latest_time from chat_connections where room_id=?`
-		db.QueryRow(checkTimeQuery, chatConnection.RoomId).Scan(&forTime.SenderId, &forTime.ReceiverId, &forTime.LatestTime) //#ambiguous as room_id ko satta same tala use gareko can be used.
+		db.QueryRow(checkTimeQuery, chatConnection.RoomId.Int64).Scan(&forTime.SenderId, &forTime.ReceiverId, &forTime.LatestTime)
+		//
+		//#ambiguous as room_id ko satta same tala use gareko can be used.
 		//? to check roomid=yes and latesttime if null: means request sent but not responded.
 		//? if not null when there is roomid:request has been accepted and there might be chats available.
+		//
 		if forTime.LatestTime.Valid {
 			query := `select receiver_id,chat from private_chats_table where private_room_id=?`
-			rows, er := db.Query(query, chatConnection.RoomId)
+			rows, er := db.Query(query, chatConnection.RoomId.Int64)
 
 			if er != nil {
 				fmt.Print("error while selecting rows inside the loadChatHistory.go")
@@ -74,18 +104,21 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			mapJSON["SenderId"] = forTime.SenderId
 			mapJSON["ReceiverId"] = forTime.ReceiverId
 			mapJSON["Status"] = "Accepted"
-
+			fmt.Print("\n\n\n\n", mapJSON, "\n\n\n\n")
 			er = json.NewEncoder(w).Encode(mapJSON)
 			if er != nil {
 				fmt.Print("error while encoding from loadchathistory.go")
 
 			}
-		} else { //? time =null
+		} else {
+			//? time =null
 			//? here condition of no input in table cannot occur as here only request from the homelist can arrive here as they only have roomid.
+			//
 			mapJSON["PrivateChats"] = listOfLocalPrivateChat
 			mapJSON["SenderId"] = forTime.SenderId
 			mapJSON["ReceiverId"] = forTime.ReceiverId
 			mapJSON["Status"] = "RequestPending"
+			fmt.Print("\n\n\n\n", mapJSON, "\n\n\n\n")
 			er := json.NewEncoder(w).Encode(mapJSON)
 			if er != nil {
 				fmt.Print("error while encoding from loadchathistory.go")
@@ -102,17 +135,24 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		//@ below condition checks if A profile is searching someone who is not connected. if i search hrithwik roshan, i dont have any chat message neither i have any friend request sent. so no history in chat_connecitons .
 
 		if oneRow == sql.ErrNoRows {
+			fmt.Print("\n\n\n\n\n hello brother\n\n\n\n\n\n")
+			fmt.Print("\n\n\n\n\n\n", extractedReceiverId, "\n\n\n\n\n\n")
+			fmt.Print("\n\n\n\n\n\n", extractedSenderId, "\n\n\n\n\n\n")
 			//@ for unknown names clicked from searchbar.
+			//@ for such thing , sender and receiverId will be 0 as no entry , so no registration.
 			mapJSON["PrivateChats"] = listOfLocalPrivateChat
 			mapJSON["SenderId"] = extractedSenderId
 			mapJSON["ReceiverId"] = extractedReceiverId
-			mapJSON["Status"] = "NoConnection"
+			mapJSON["Status"] = "NotConnected"
+			fmt.Print("\n\n\n\n", mapJSON, "\n\n\n\n")
 			errors := json.NewEncoder(w).Encode(mapJSON)
 			if errors != nil {
 				fmt.Print("error while errnoRows fromloadchathistory.go")
 			}
 			return
-		} else { //@ if single row displayed this is run as this means there is already a request, or chat history pre existing.
+		} else {
+			//@ if single row displayed this is run as this means there is already a request, or chat history pre existing.
+			//
 			if nullTime.Valid {
 				//@ valid means there is time value (!=null), so there can be messages.
 
@@ -134,7 +174,7 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 				mapJSON["SenderId"] = extractedSenderId
 				mapJSON["ReceiverId"] = extractedReceiverId
 				mapJSON["Status"] = "Accepted"
-
+				fmt.Print("\n\n\n\n", mapJSON, "\n\n\n\n")
 				er = json.NewEncoder(w).Encode(mapJSON)
 				if er != nil {
 					fmt.Print("error while encoding from loadchathistory.go")
@@ -147,6 +187,7 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 				mapJSON["SenderId"] = extractedSenderId
 				mapJSON["ReceiverId"] = extractedReceiverId
 				mapJSON["Status"] = "RequestPending"
+				fmt.Print("\n\n\n\n", mapJSON, "\n\n\n\n")
 				errors := json.NewEncoder(w).Encode(mapJSON)
 				if errors != nil {
 					fmt.Print("error while noHistory from loadchathistory.go")
