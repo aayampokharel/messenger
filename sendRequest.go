@@ -4,71 +4,92 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"sync"
+	"time"
 )
-type RequestSent struct{
-	Sender_id int `json:"Sender_id"`
-	Receiver_id int `json:"Receiver_id"`
-	//Latest_message_timing time.Time `json:"Latest_message_timing"` 
-	 // this is not required 
-}
-var chat_connectionsTableLock =&sync.Mutex{};
 
-func sendRequest(db *sql.DB,_ http.ResponseWriter, r *http.Request) {
-	
- //@ request sent after "send  request" button is pressed in frontend,  sends the request:{
-    //@ Sender_id:1
+type DecodingJSON struct {
+	ReceieverId int     `json:"ReceiverId"`
+	SenderId    int     `json:"SenderId"`
+	Method      string  `json:"Method"`
+	LatestTime  *string `json:"LatestTime"`
+	RoomId      int     `json:"RoomId"`
+}
+type DecodedJSON struct {
+	ReceieverId int       `json:"ReceiverId"`
+	SenderId    int       `json:"SenderId"`
+	Method      string    `json:"Method"`
+	LatestTime  time.Time `json:"LatestTime"`
+	RoomId      int       `json:"RoomId"`
+}
+
+// type InsertMethod struct {
+// 	LatestTime time.Time `json:"LatestTime"`
+// }
+
+var chat_connectionsTableLock = &sync.Mutex{}
+
+func sendRequest(db *sql.DB, _ http.ResponseWriter, r *http.Request) {
+
+	//@ request sent after "send  request" button is pressed in frontend,  sends the request:{
+	//@ Sender_id:1
 	//@ Receiver_id:2
-    //@(FUTURE IMPLEMENT)Latest_mesasge_timing:DateTime.now() (from flutter)
-//@}
-//@ THIS f(x) INPUTS THE DATA IN chat_connections table.and its time keeps getting updated with latest message around. 
+	//@time from flutter as null(insert)/time.now()(update)
 
-var requestsent RequestSent;
-response,err:=io.ReadAll(r.Body);
-if(err!=nil){
-	fmt.Print("error while reading the request sent to sendRequest function");
-	return;
-}
+	var decodingJSON DecodingJSON
+	var decodedJSON DecodedJSON
+	if err := json.NewDecoder(r.Body).Decode(&decodingJSON); err != nil {
+		fmt.Print("Error while decoding from sendRequest.go")
+		return
+	}
+	fmt.Print("\n")
+	fmt.Print(decodedJSON)
+	fmt.Print("\n")
+	fmt.Print(decodingJSON)
 
-err=json.Unmarshal(response,&requestsent);
-if err!=nil{
-	fmt.Print("error while unmarshalling the request sent in sendRequest function");
-	return;
-}
-chat_connectionsTableLock.Lock() 
-defer chat_connectionsTableLock.Unlock();
-var count int;
+	decodedJSON.SenderId = decodingJSON.SenderId
+	decodedJSON.ReceieverId = decodingJSON.ReceieverId
+	decodedJSON.Method = decodingJSON.Method
+	decodedJSON.RoomId = decodingJSON.RoomId
+	if decodingJSON.LatestTime == nil {
 
-errors:=db.QueryRow("SELECT count(*) FROM chat_connections WHERE (sender_id=? AND receiver_id=?) OR (sender_id=? AND receiver_id=?) ",requestsent.Sender_id,requestsent.Receiver_id,requestsent.Receiver_id,requestsent.Sender_id).Scan(&count);
-if errors!=nil{
+		decodedJSON.LatestTime = time.Time{}
 
+	} else { //@ if there is time.
+		layout := time.RFC3339Nano
+		timeTimeFormat, err := time.Parse(layout, *decodingJSON.LatestTime)
+		if err != nil {
+			fmt.Print("error while converting to time.Time from sendRequest.go")
+			return
+		}
+		decodedJSON.LatestTime = timeTimeFormat
+	}
+	fmt.Print("\n helllo brother \n")
+	chat_connectionsTableLock.Lock()
+	defer chat_connectionsTableLock.Unlock()
+	if decodedJSON.Method == "INSERT" {
+		roomId := generateRandomNumber()
+		fmt.Print("\n\n")
+		fmt.Print(roomId, decodedJSON)
+		fmt.Print("\n\n")
+		query := `insert into chat_connections(room_id,sender_id,receiver_id) values (?,?,?)`
+		_, err := db.Exec(query, roomId, decodedJSON.SenderId, decodedJSON.ReceieverId)
+		if err != nil {
+			fmt.Print("error while executing in sendRequest.go")
+			return
+		}
+		//@ no time required as default is null .
+	}
 
-	fmt.Print("error while reading count in sendrequest.go");
-}
+	if decodedJSON.Method == "UPDATE" {
+		query := `update chat_connections set latest_time=? where room_id=?`
+		_, er := db.Exec(query, decodedJSON.LatestTime, decodedJSON.RoomId)
+		if er != nil {
+			fmt.Print("error while executing query in sendrequest.go in updating")
+			return
+		}
 
+	}
 
-
-//currentTime:=time.Now(); //! THIS IS TO BE EDITED AS i NEED THIS FROM FLUTTER.
-//latest_message_timing := currentTime.Format("2006-01-02 15:04:05")
-
-// room_id:=generateRandomNumber();
-
-if (count!=0 ||  requestsent.Sender_id == requestsent.Receiver_id){
-	fmt.Print("invalid insertion while count !=0 or same value ")
-return;
-}
-sender_id:=requestsent.Sender_id;
-request_id:=requestsent.Receiver_id;
-room_id:=generateRandomNumber();
-
-
-query:="INSERT INTO chat_connections(room_id,sender_id,receiver_id) VALUES (?,?,?)";
-_,er:= db.Exec(query,room_id,sender_id,request_id);
-if er != nil {
-	fmt.Print("cant insert as error occured in sendrequest. ")
-	return;
-}
- 
 }
