@@ -57,7 +57,8 @@ class _HomeBodyState extends State<HomeBody> {
     chatConnectionChannel.sink.close();
   }
 
-  forNewMessage(List<dynamic> dataFromServer, Map<String, dynamic> newMessage) {
+  forNewMessage(dynamic dataFromServer, Map<dynamic, dynamic> newMessage) {
+    //!code changed where datafromserver ko type previously was list<dynamic> to dynamic
     int index = dataFromServer
         .indexWhere((element) => element["RoomId"] == newMessage["RoomID"]);
 
@@ -67,6 +68,7 @@ class _HomeBodyState extends State<HomeBody> {
     } else {
       dataFromServer.insert(0, newMessage);
     }
+    print("correct ✅✅✅");
   }
 
   @override
@@ -109,6 +111,7 @@ class _HomeBodyState extends State<HomeBody> {
                   ],
                 );
               } else {
+                print("no data");
                 return CircularProgressIndicator();
               }
             }),

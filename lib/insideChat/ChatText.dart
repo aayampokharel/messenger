@@ -14,7 +14,8 @@ class ChatText extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-                color: const Color.fromARGB(255, 54, 225, 255),
+                width: 200,
+                color: Color.fromARGB(255, 169, 169, 241),
                 child: Text(Chat)),
           )),
     );
