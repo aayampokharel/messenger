@@ -47,7 +47,7 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	var chatConnectionPointer ChatConnectionPointerInt
 
 	err := json.NewDecoder(r.Body).Decode(&chatConnectionPointer)
-	//
+
 	if err != nil {
 		fmt.Print("error while decoding in loadchathistory.go")
 		return
@@ -66,6 +66,7 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	}
 	fmt.Print(chatConnection, " \n\n\n\n\n\n\n\n")
+	fmt.Print("yes inside loadchathistory")
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	mapJSON := make(map[string]interface{}) /// { PrivateChats, }
@@ -85,7 +86,8 @@ func loadChatHistory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		//#ambiguous as room_id ko satta same tala use gareko can be used.
 		//? to check roomid=yes and latesttime if null: means request sent but not responded.
 		//? if not null when there is roomid:request has been accepted and there might be chats available.
-		//
+		fmt.Print("\n\n\n\n\n\n", forTime, chatConnection.RoomId.Int64, "\n\n\n ", "ues")
+
 		if forTime.LatestTime.Valid {
 			query := `select receiver_id,chat from private_chats_table where private_room_id=?`
 			rows, er := db.Query(query, chatConnection.RoomId.Int64)

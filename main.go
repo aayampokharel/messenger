@@ -59,7 +59,7 @@ func main() {
 		CORSfix(w)
 		getNamesFromLoginTable(db, w, r)
 	})
-	chiRouter.Post("/getcurrentuseridandflag", func(w http.ResponseWriter, r *http.Request) {
+	chiRouter.Post("/getcurrentuserid", func(w http.ResponseWriter, r *http.Request) { //! this getcurrentuserid changed from id and flag.
 		CORSfix(w)
 		getCurrentUserIdAndFlag(db, w, r) //@ userid ra flag return garcha.
 	})
