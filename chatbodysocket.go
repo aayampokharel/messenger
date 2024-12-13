@@ -51,6 +51,7 @@ func chatBodySocket(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
+	fmt.Print(("\n bbbbbbb\n\n"))
 	defer chatHandshake.Close(websocket.StatusNormalClosure, "websocket closed normally")
 
 	mapForSenderReceiverId[chatHandshake] = <-ch //! search for better approach later in the future.

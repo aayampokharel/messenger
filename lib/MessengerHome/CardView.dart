@@ -9,8 +9,9 @@ class CardView extends StatelessWidget {
   int ReceiverId;
   String DisplayName;
   Stream chatStream;
+  WebSocketChannel chatChannel;
   CardView(this.RoomId, this.SenderId, this.ReceiverId, this.DisplayName,
-      this.chatStream);
+      this.chatStream, this.chatChannel);
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +25,8 @@ class CardView extends StatelessWidget {
           subtitle: const Text("sample last message "),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => ChatBody(
-                    RoomId, SenderId, ReceiverId, DisplayName, chatStream)));
+                builder: (context) => ChatBody(RoomId, SenderId, ReceiverId,
+                    DisplayName, chatStream, chatChannel)));
           }),
     );
   }

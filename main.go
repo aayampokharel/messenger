@@ -42,6 +42,8 @@ func main() {
 	chiRouter.Post("/homehistory", func(w http.ResponseWriter, r *http.Request) {
 		CORSfix(w)
 		homeHistory(db, w, r)
+		///initially load hune messenger home load garna help garcha esle .
+
 	})
 	chiRouter.Post("/chathistory", func(w http.ResponseWriter, r *http.Request) {
 		CORSfix(w)
@@ -50,6 +52,7 @@ func main() {
 	chiRouter.Post("/getnamesfromlogintable", func(w http.ResponseWriter, r *http.Request) {
 		CORSfix(w)
 		getNamesFromLoginTable(db, w, r)
+		///For search ko lagi reqf names , also supports where i cant search myself . this is for searching for new friends .
 	})
 	chiRouter.Post("/getnamesfromsearchhistorytable", func(w http.ResponseWriter, r *http.Request) {
 		CORSfix(w)

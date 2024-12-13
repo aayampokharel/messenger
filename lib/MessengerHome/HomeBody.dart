@@ -11,7 +11,11 @@ import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HomeBody extends StatefulWidget {
-  String email;
+  ////
+  ////
+  ////
+  ///ONLY FOR TESYING PURPOSE >
+  String email = "srk_offficial@gmail.com";
   HomeBody(this.email);
 
   @override
@@ -32,11 +36,21 @@ class _HomeBodyState extends State<HomeBody> {
     var currentIdResponse = await http.post(
         Uri.parse(
             "http://localhost:8080/getcurrentuserid"), //@ thsi also inserts the currentuserid for websocket ,
-        body: json.encode({"Email": widget.email}));
+////
+////
+////
+        //// FOR testing purpose only ....
+        //  body: json.encode({"Email": widget.email}));
+        body: json.encode({"Email": "srk_offficial@gmail.com"}));
     globalCurrentUserId = json.decode(currentIdResponse.body)["CurrentUserId"];
-    var response = await http.post(
-        Uri.parse("http://localhost:8080/homehistory"),
-        body: json.encode({"Email": widget.email}));
+    var response =
+        await http.post(Uri.parse("http://localhost:8080/homehistory"),
+            //body: json.encode({"Email": widget.email}));
+////
+////
+////
+            //// FOR testing purpose only ....
+            body: json.encode({"Email": "srk_offficial@gmail.com"}));
 
     var decodedList = json.decode(response.body);
     return decodedList;
@@ -53,7 +67,7 @@ class _HomeBodyState extends State<HomeBody> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    print("CLOSED");
+
     chatConnectionChannel.sink.close();
   }
 
@@ -68,7 +82,6 @@ class _HomeBodyState extends State<HomeBody> {
     } else {
       dataFromServer.insert(0, newMessage);
     }
-    print("correct ✅✅✅");
   }
 
   @override
@@ -80,9 +93,6 @@ class _HomeBodyState extends State<HomeBody> {
             future: _dataForHome,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                print("hello brother=====>>>>>");
-                print(snapshot.data);
-                print("hello ========>");
                 var dataFromServer = snapshot.data;
                 if (dataFromServer == "NODATA") {
                   return const EmptyCase();
@@ -105,13 +115,13 @@ class _HomeBodyState extends State<HomeBody> {
                                     dataFromServer[index]["SenderId"],
                                     dataFromServer[index]["ReceiverId"],
                                     dataFromServer[index]["DisplayName"],
-                                    chatStream));
+                                    chatStream,
+                                    chatConnectionChannel));
                           }),
                     )
                   ],
                 );
               } else {
-                print("no data");
                 return CircularProgressIndicator();
               }
             }),

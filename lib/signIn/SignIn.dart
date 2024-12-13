@@ -18,7 +18,7 @@ class MainBodySignIn extends StatelessWidget {
       "Name": nameController.text,
       "Key": passwordController.text
     };
-    print(emailController.text);
+
     await http.post(Uri.parse("http://localhost:8080/signin"),
         body: json.encode(map));
 
