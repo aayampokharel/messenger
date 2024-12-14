@@ -27,14 +27,14 @@ class Login extends StatelessWidget {
 
             ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-
-                      /// THIS IS FOR TESTING PURPOSe.-_-_-_-_-_-__-_-_-_-_-_-_-_-_-_-_-_-_-
-                      builder: (context) => HomeBody(
-                          "srk_offficial@gmail.com"))); //@ represents the messager's body after signin.
                   // Navigator.of(context).push(MaterialPageRoute(
-                  //     builder: (context) => HomeBody(_emailController
-                  //         .text))); //@ represents the messager's body after signin.
+
+                  //     /// THIS IS FOR TESTING PURPOSe.-_-_-_-_-_-__-_-_-_-_-_-_-_-_-_-_-_-_-
+                  //     builder: (context) => HomeBody(
+                  //         "srk_offficial@gmail.com"))); //@ represents the messager's body after signin.
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => HomeBody(_emailController
+                          .text))); //@ represents the messager's body after signin.
                 },
                 child: const Text("Submit")),
             const Divider(

@@ -15,7 +15,7 @@ class HomeBody extends StatefulWidget {
   ////
   ////
   ///ONLY FOR TESYING PURPOSE >
-  String email = "srk_offficial@gmail.com";
+  String email;
   HomeBody(this.email);
 
   @override
@@ -40,17 +40,17 @@ class _HomeBodyState extends State<HomeBody> {
 ////
 ////
         //// FOR testing purpose only ....
-        //  body: json.encode({"Email": widget.email}));
-        body: json.encode({"Email": "srk_offficial@gmail.com"}));
+        body: json.encode({"Email": widget.email}));
+    // body: json.encode({"Email": "srk_offficial@gmail.com"}));
     globalCurrentUserId = json.decode(currentIdResponse.body)["CurrentUserId"];
-    var response =
-        await http.post(Uri.parse("http://localhost:8080/homehistory"),
-            //body: json.encode({"Email": widget.email}));
+    var response = await http.post(
+        Uri.parse("http://localhost:8080/homehistory"),
+        body: json.encode({"Email": widget.email}));
 ////
 ////
 ////
-            //// FOR testing purpose only ....
-            body: json.encode({"Email": "srk_offficial@gmail.com"}));
+    //// FOR testing purpose only ....
+    // body: json.encode({"Email": "srk_offficial@gmail.com"}));
 
     var decodedList = json.decode(response.body);
     return decodedList;

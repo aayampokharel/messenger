@@ -79,9 +79,20 @@ class _ChatBodyState extends State<ChatBody> {
                   ///backend bata message is sent to another user only , eeutai user ko ma locally list ma direct store huncha to save bandwidth. so maile "hi " pathae bhane direct add mero list ma but will send this msg to another through this Stream and will display in real time .
                   builder: (context, streamSnapshot) {
                     if (streamSnapshot.hasData) {
-                      //MapOfMessages
+                      print("\n\n\n data aaeko cha !!!!\n\n");
+                      print("\n\n\n😂😂😂");
+                      print("Stream snapshot data: ${streamSnapshot.data}");
+
+                      print("\n\n\n😂😂😂");
+                      // if (int.parse((json
+                      //         .decode(streamSnapshot.data["RoomId"])
+                      //         .toString())) ==
+                      //     widget.RoomId) {
+                      //   print(streamSnapshot.data);
+                      //   print("😂😂😂\n\n");
+                      // }
                     }
-                    //print("\n\n 💦💦 ${streamSnapshot.data} \n\n");
+
                     return Column(
                       children: [
                         Expanded(
@@ -92,7 +103,7 @@ class _ChatBodyState extends State<ChatBody> {
                               // Extract the individual chat message
                               var chatMessage = ListOfMessages[index];
                               bool isReceiver = chatMessage['ReceiverId'] ==
-                                  widget.ReceiverId;
+                                  globalOtherUserId;
 
                               // Conditional rendering based on ReceiverId
                               return Align(
@@ -141,23 +152,22 @@ class _ChatBodyState extends State<ChatBody> {
                       "ReceiverId": globalOtherUserId,
                       "Chat": chatController.text.trim().toString(),
                     };
-                    print("\n\n");
-                    print("map");
+                    print(globalOtherUserId);
+                    print(globalCurrentUserId);
                     print(map);
-                    print("\n\n");
-
                     widget.chatChannel.sink.add(json.encode(map));
-                    setState(() {
-                      ListOfMessages.add({
-                        "ReceiverId": map["ReceiverId"],
-                        "Chat": map["Chat"],
-                      });
-                      _scrollToBottom();
-                    });
+                    setState(
+                      () {
+                        ListOfMessages.add({
+                          "ReceiverId": map["ReceiverId"],
+                          "Chat": map["Chat"],
+                        });
+                        _scrollToBottom();
+                      },
+                    );
 //  chatStream..sink.add()
                   }, // You can implement send functionality here
                   icon: const Icon(Icons.send),
-                  //icon: const Icon(Icons.circle),
                 ),
               ],
             ),
