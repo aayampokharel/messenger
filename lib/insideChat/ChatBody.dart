@@ -22,6 +22,7 @@ class ChatBody extends StatefulWidget {
 }
 
 class _ChatBodyState extends State<ChatBody> {
+  bool skipRebuild = false;
   ScrollController scrollController =
       ScrollController(); // Controller for ListView
   late StreamController _streamController;
@@ -53,6 +54,7 @@ class _ChatBodyState extends State<ChatBody> {
   @override
   Widget build(BuildContext context) {
     var MapOfMessages;
+    Map mapOfReceivedChatStream;
 
     if (widget.ReceiverId == globalCurrentUserId) {
       globalOtherUserId =
@@ -79,19 +81,24 @@ class _ChatBodyState extends State<ChatBody> {
                   ///backend bata message is sent to another user only , eeutai user ko ma locally list ma direct store huncha to save bandwidth. so maile "hi " pathae bhane direct add mero list ma but will send this msg to another through this Stream and will display in real time .
                   builder: (context, streamSnapshot) {
                     if (streamSnapshot.hasData) {
-                      print("\n\n\n data aaeko cha !!!!\n\n");
-                      print("\n\n\n😂😂😂");
-                      print("Stream snapshot data: ${streamSnapshot.data}");
+                      mapOfReceivedChatStream =
+                          json.decode(streamSnapshot.data);
 
-                      print("\n\n\n😂😂😂");
-                      // if (int.parse((json
-                      //         .decode(streamSnapshot.data["RoomId"])
-                      //         .toString())) ==
-                      //     widget.RoomId) {
-                      //   print(streamSnapshot.data);
-                      //   print("😂😂😂\n\n");
-                      // }
+                      print("✔✔✔😂\n");
+                      print(mapOfReceivedChatStream["RoomId"]);
+                      print(widget.RoomId);
+                      print("✔✔✔😂\n");
+                      if (mapOfReceivedChatStream["RoomId"] == widget.RoomId) {
+                        print(mapOfReceivedChatStream);
+
+                        ListOfMessages.add({
+                          "ReceiverId": mapOfReceivedChatStream["ReceiverId"],
+                          "Chat": mapOfReceivedChatStream["Chat"]
+                        });
+                        print("✔✔");
+                      }
                     }
+                    skipRebuild = true;
 
                     return Column(
                       children: [
@@ -152,12 +159,11 @@ class _ChatBodyState extends State<ChatBody> {
                       "ReceiverId": globalOtherUserId,
                       "Chat": chatController.text.trim().toString(),
                     };
-                    print(globalOtherUserId);
-                    print(globalCurrentUserId);
-                    print(map);
+
                     widget.chatChannel.sink.add(json.encode(map));
                     setState(
                       () {
+                        skipRebuild = true;
                         ListOfMessages.add({
                           "ReceiverId": map["ReceiverId"],
                           "Chat": map["Chat"],
