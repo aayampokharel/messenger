@@ -23,6 +23,7 @@ class ChatBody extends StatefulWidget {
 
 class _ChatBodyState extends State<ChatBody> {
   bool skipRebuild = false;
+  var x = "variable";
   ScrollController scrollController =
       ScrollController(); // Controller for ListView
   late StreamController _streamController;
@@ -80,14 +81,14 @@ class _ChatBodyState extends State<ChatBody> {
 
                   ///backend bata message is sent to another user only , eeutai user ko ma locally list ma direct store huncha to save bandwidth. so maile "hi " pathae bhane direct add mero list ma but will send this msg to another through this Stream and will display in real time .
                   builder: (context, streamSnapshot) {
-                    if (streamSnapshot.hasData) {
+                    print(skipRebuild);
+                    print(x);
+                    if (streamSnapshot.hasData && !skipRebuild) {
                       mapOfReceivedChatStream =
                           json.decode(streamSnapshot.data);
 
                       print("✔✔✔😂\n");
-                      print(mapOfReceivedChatStream["RoomId"]);
-                      print(widget.RoomId);
-                      print("✔✔✔😂\n");
+
                       if (mapOfReceivedChatStream["RoomId"] == widget.RoomId) {
                         print(mapOfReceivedChatStream);
 
@@ -95,10 +96,10 @@ class _ChatBodyState extends State<ChatBody> {
                           "ReceiverId": mapOfReceivedChatStream["ReceiverId"],
                           "Chat": mapOfReceivedChatStream["Chat"]
                         });
-                        print("✔✔");
                       }
+                      print("✔✔✔ DONE !!!!");
                     }
-                    skipRebuild = true;
+                    // skipRebuild = false;
 
                     return Column(
                       children: [
@@ -154,23 +155,36 @@ class _ChatBodyState extends State<ChatBody> {
                 IconButton(
                   onPressed: () {
                     //    print(futureSnapshot.data);
+                    print(skipRebuild);
                     Map<String, dynamic> map = {
                       "RoomId": widget.RoomId,
                       "ReceiverId": globalOtherUserId,
                       "Chat": chatController.text.trim().toString(),
                     };
+                    print("before chatchannel add ");
 
                     widget.chatChannel.sink.add(json.encode(map));
+                    print("after chatchannel add ");
+                    skipRebuild = true;
                     setState(
                       () {
-                        skipRebuild = true;
+                        print("after chatchannel add ");
+                        print("inside setstate ");
+                        // Future.delayed(Duration(seconds: 0), () {
+                        //   x = "ali";
+                        //   skipRebuild = false;
+                        // });
                         ListOfMessages.add({
                           "ReceiverId": map["ReceiverId"],
                           "Chat": map["Chat"],
                         });
-                        _scrollToBottom();
+                        // _scrollToBottom();
                       },
                     );
+                    Future.delayed(Duration(milliseconds: 50), () {
+                      skipRebuild = false;
+                    });
+
 //  chatStream..sink.add()
                   }, // You can implement send functionality here
                   icon: const Icon(Icons.send),
