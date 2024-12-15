@@ -181,7 +181,7 @@ class _ChatBodyState extends State<ChatBody> {
                         // _scrollToBottom();
                       },
                     );
-                    Future.delayed(Duration(milliseconds: 50), () {
+                    Future.delayed(Duration(milliseconds: 20), () {
                       skipRebuild = false;
                     });
 
