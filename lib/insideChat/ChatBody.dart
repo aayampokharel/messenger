@@ -72,26 +72,16 @@ class _ChatBodyState extends State<ChatBody> {
             future: getChatHistoryList(),
             builder: (context, futureSnapshot) {
               if (futureSnapshot.hasData) {
-                // print("💦💦\n ${futureSnapshot.data}\n");
-                // ListOfMessages = futureSnapshot.data![
-                //   "PrivateChats"]; //for setstate to work for new messages .
-
                 return StreamBuilder(
                   stream: widget.chatStream.asBroadcastStream(),
 
                   ///backend bata message is sent to another user only , eeutai user ko ma locally list ma direct store huncha to save bandwidth. so maile "hi " pathae bhane direct add mero list ma but will send this msg to another through this Stream and will display in real time .
                   builder: (context, streamSnapshot) {
-                    print(skipRebuild);
-                    print(x);
                     if (streamSnapshot.hasData && !skipRebuild) {
                       mapOfReceivedChatStream =
                           json.decode(streamSnapshot.data);
 
-                      print("✔✔✔😂\n");
-
                       if (mapOfReceivedChatStream["RoomId"] == widget.RoomId) {
-                        print(mapOfReceivedChatStream);
-
                         ListOfMessages.add({
                           "ReceiverId": mapOfReceivedChatStream["ReceiverId"],
                           "Chat": mapOfReceivedChatStream["Chat"]
@@ -154,26 +144,17 @@ class _ChatBodyState extends State<ChatBody> {
                 ),
                 IconButton(
                   onPressed: () {
-                    //    print(futureSnapshot.data);
-                    print(skipRebuild);
                     Map<String, dynamic> map = {
                       "RoomId": widget.RoomId,
                       "ReceiverId": globalOtherUserId,
                       "Chat": chatController.text.trim().toString(),
                     };
-                    print("before chatchannel add ");
 
                     widget.chatChannel.sink.add(json.encode(map));
-                    print("after chatchannel add ");
+
                     skipRebuild = true;
                     setState(
                       () {
-                        print("after chatchannel add ");
-                        print("inside setstate ");
-                        // Future.delayed(Duration(seconds: 0), () {
-                        //   x = "ali";
-                        //   skipRebuild = false;
-                        // });
                         ListOfMessages.add({
                           "ReceiverId": map["ReceiverId"],
                           "Chat": map["Chat"],
